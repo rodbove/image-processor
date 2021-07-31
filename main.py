@@ -20,8 +20,6 @@ def handle_command(params):
     if params.downscale:
         image = utils.scale_image_down(params.downscale, image)
 
-    cv2.imshow('Image', image)
-    cv2.waitKey(0)
     cv2.imwrite(params.target, image)
 
 if __name__ == "__main__":
