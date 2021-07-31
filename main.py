@@ -1,18 +1,28 @@
+import cli.app
 import cv2
+from src.lib import utils
 
-image = cv2.imread('/home/rodrigo/Imagens/self.jpg')
+@cli.app.CommandLineApp
+def imgp(app):
+    handle_command(app.params)
 
-width = image.shape[1]
-height = image.shape[2]
+imgp.add_param("-p", "--path", help="Path to image file", type=str, required=True)
+imgp.add_param("-f", "--flip", help="Orientation to flip image", type=str)
+imgp.add_param("-d", "--downscale", help="Multiplier to downscale image (2, 3, 4 times...)", type=int)
+imgp.add_param("-t", "--target", help="Target destination for modified file. Directory defaults do current if just the file name is provided", type=str, required=True)
 
-(b, g, r) = image[0, 0]
+def handle_command(params):
+    image = cv2.imread(params.path)
 
-for y in range(0, image.shape[0]):
-    for x in range(0, image.shape[1]):
-        if x%2 == 0:
-            (b, g, r) = image[y, x]
-            image[y, x] = ((y/2)%256, (y/2)%256, r)
+    if params.flip:
+        image = utils.flip_image(params.flip, image)
 
+    if params.downscale:
+        image = utils.scale_image_down(params.downscale, image)
 
-cv2.imshow('My image', image)
-cv2.waitKey(0)
+    cv2.imshow('Image', image)
+    cv2.waitKey(0)
+    cv2.imwrite(params.target, image)
+
+if __name__ == "__main__":
+    imgp.run()
